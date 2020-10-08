@@ -11,5 +11,5 @@ set /p port=What's the COM port? (please enter a number)
 @mode com%port% baud=1200
 pause
 
-.\updater\bossac.exe -d -U true -i -e -w -v -b C:\Users\Shannon\Dropbox\moog\spankulator\code\out\Spankulator.ino.bin -R
+.\updater\bossac.exe -d -U true -i -e -w -v -b .\out\Spankulator.ino.bin -R
 pause

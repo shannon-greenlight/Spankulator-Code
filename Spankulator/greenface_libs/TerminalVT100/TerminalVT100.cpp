@@ -1,6 +1,7 @@
 /*
   TerminalVT100.h - TerminalVT100 library
   Copyright (c) 2019 Shannon Vance.  All right reserved.
+  https://en.wikipedia.org/wiki/ANSI_escape_code
 */
 
 // include core API
@@ -24,7 +25,7 @@ void TerminalVT100::begin()
 
   Serial.begin(9600);
   // do {
-	//   ;
+  //   ;
   // } while(!Serial);
 
   // Use Putty to communicate (VT100 terminal)
@@ -49,16 +50,15 @@ void TerminalVT100::clrToEOL()
   print("\e[0K");
 }
 
-
 void TerminalVT100::setCursor(String row, String col)
 {
-  print("\e["+row+";"+col+"H");
+  print("\e[" + row + ";" + col + "H");
   //print("\e[2K");
 }
 
 void TerminalVT100::setRow(String row)
 {
-  print("\e["+row+";1H");
+  print("\e[" + row + ";1H");
   //print("\e[2K");
 }
 
@@ -78,37 +78,43 @@ void TerminalVT100::clrDown(String row)
   print("\e[J"); // clear screen
 }
 
-void TerminalVT100::blinkOn() {
+void TerminalVT100::blinkOn()
+{
   print("\e[5m");
 }
 
-void TerminalVT100::blinkOff() {
+void TerminalVT100::blinkOff()
+{
   print("\e[0m");
 }
 
-void TerminalVT100::printChars(int nchars, String s) {
-	for (int i = 0; i < nchars; i++) {
-		print(s);
-	}
+void TerminalVT100::printChars(int nchars, String s)
+{
+  for (int i = 0; i < nchars; i++)
+  {
+    print(s);
+  }
 }
 
-void TerminalVT100::printTitle(int width, String title) {
-	int spaces = (((width-2) - title.length()) / 2);
-	//println("");
-	print("*");
-	printChars(spaces, " ");
-	print(title);
-	printChars(spaces, " ");
-	println("*");
+void TerminalVT100::printTitle(int width, String title)
+{
+  float spaces = (((width - 2) - title.length()) / 2);
+  //println("");
+  print("*");
+  printChars(floor(spaces), " ");
+  print(title);
+  // printChars(ceil(spaces), " ");
+  // println("*");
+  // println("Spaces: " + String(spaces));
 }
 
-void TerminalVT100::printVal(String row, String label, String val) {
-	setRow(row);
-	print(label);
-	clrToEOL();
-	println(val);
+void TerminalVT100::printVal(String row, String label, String val)
+{
+  setRow(row);
+  print(label);
+  clrToEOL();
+  println(val);
 }
 
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
-

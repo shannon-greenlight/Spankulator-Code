@@ -1,8 +1,11 @@
 // hardware
+#include <BufferedOutput.h>
 const byte toggle_out_pin = 5;
 const byte repeat_led_pin = 6;
-const byte triggered_led_pin = 12;
 const byte gate_out_pin = 9;
+const byte disable_trigger_pin = 11;
+const byte triggered_led_pin = 12;
+
 const byte aout_pin = A0;
 const byte ain1_pin = A1;
 const byte ain2_pin = A2;
@@ -13,28 +16,31 @@ const byte up_button_pin = 0;
 const byte dn_button_pin = 1;
 const byte repeat_button_pin = 4;
 const byte trigger_button_pin = 7;
-const byte disable_trigger_pin = OLD_STYLE ? A3 : 11;
-const byte param_up_button_pin = A6;  //8;
-const byte param_dn_button_pin = A7;  //10;
-const byte left_button_pin = 10; //A6;
-const byte right_button_pin = 8; //A7;
+const byte param_up_button_pin = A6; //8;
+const byte param_dn_button_pin = A7; //10;
+const byte left_button_pin = 10;     //A6;
+const byte right_button_pin = 8;     //A7;
+
+BufferedOutput gate(gate_out_pin);
+BufferedOutput tog(toggle_out_pin);
 
 // Rotary Encoder
-void intFxnA(void) {
+void intFxnA(void)
+{
   e.aChanInt();
 }
 
-void intFxnB(void) {
+void intFxnB(void)
+{
   e.bChanInt();
 }
 
-void hardware_begin() {
+void hardware_begin()
+{
   e.numFxns = 0;
   //e.t = ui.t;
   //e.debug = true;
 
-  pinMode(toggle_out_pin, OUTPUT);
-  pinMode(gate_out_pin, OUTPUT);
   pinMode(repeat_led_pin, OUTPUT);
   pinMode(disable_trigger_pin, OUTPUT);
   pinMode(triggered_led_pin, OUTPUT);
@@ -52,7 +58,4 @@ void hardware_begin() {
 
   analogWriteResolution(10);
   analogWrite(A0, 511);
-
 }
-
-

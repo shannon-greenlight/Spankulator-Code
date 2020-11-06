@@ -6,7 +6,12 @@ echo -------------------
 powershell.exe [System.IO.Ports.SerialPort]::getportnames()
 echo.
 echo.
-set /p port=What's the COM port? (please enter a number)
+set port=%SPANK_PORT%
+set /p port=What's the COM port? (please enter a number or press ENTER to use com%SPANK_PORT%) 'x' to exit 
+
+if %port% == x exit
+
+setx SPANK_PORT %port%
 
 @mode com%port% baud=1200
 pause

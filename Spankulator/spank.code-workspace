@@ -4,6 +4,9 @@
 			"path": "."
 		},
 		{
+			"path": ".\\greenface_libs"
+		},
+		{
 			"path": "C:\\Users\\Shannon\\Documents\\Arduino\\libraries"
 		}
 	],

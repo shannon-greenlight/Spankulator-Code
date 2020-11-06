@@ -1,9 +1,8 @@
-#define OLD_STYLE false
-typedef void(*FunctionPointer)();
+typedef void (*FunctionPointer)();
 
 // Load 3rd party libraries
 #include <stdlib.h>
-#include <Wire.h>           // For I2C comm, but needed for not getting compile error
+#include <Wire.h> // For I2C comm, but needed for not getting compile error
 #include <Timer5.h>
 #include <Adafruit_FRAM_I2C.h>
 #include <WiFiNINA.h>
@@ -24,23 +23,21 @@ typedef void(*FunctionPointer)();
 int volatile keypress = 0;
 boolean esc_mode = false;
 boolean triggered = false;
-boolean doing_trigger=false;
-int last_encoder_val = 0;
-unsigned long last_change_time = 0;
-float the_delay = 0;
-bool toggle_state = false;
-int lines[] = {LINE_1, LINE_2, LINE_3};
+boolean doing_trigger = false;
+// bool toggle_state = false;
 int adj;
 int init_adj;
 float scale;
 int offset;
+String in_str = ""; // for serial input
+boolean cmd_available = false;
 
 #include "hardware_defs.h"
 #include "general_fxns.h"
 
 #include "SPANK_fxn.h"
 
-#include "face1.h"  // greenface logo art
+#include "face1.h" // greenface logo art
 
 SPANK_fxn *the_spanker;
 
@@ -48,9 +45,18 @@ SPANK_fxn *the_spanker;
 ArducamSSD1306 display(OLED_RESET);
 SPANK_ui ui(&display);
 
-int Greenface_EEPROM::eeprom_offset = 16;
-EEPROM_Int fxn = EEPROM_Int(0, 1000); // set max to real max when num_fxns has been defined
-EEPROM_Bool repeat_on = EEPROM_Bool();  // sizeof fxn val
+#define EEPROM_DATA_START 16
+#define EEPROM_INIT_FLAG 14
+#define EEPROM_INIT_PATTERN 0x55aa
+
+int Greenface_EEPROM::eeprom_offset = EEPROM_DATA_START;
+EEPROM_Int fxn = EEPROM_Int(0, 1000);  // set max to real max when num_fxns has been defined
+EEPROM_Bool repeat_on = EEPROM_Bool(); // sizeof fxn val
+
+bool is_initialized()
+{
+  return fxn.read_int(EEPROM_INIT_FLAG) == EEPROM_INIT_PATTERN;
+}
 
 #define UP_FXN 0
 #define DN_FXN 1
@@ -82,61 +88,92 @@ void setup(void)
 {
   begin_all();
 
-  set_encoder();  // sets msb,lsb for two types of encoder
+  set_encoder(); // sets msb,lsb for two types of encoder
 
   // connect if wifi is active
-  wifi_attempt_connect(true);
+  wifi_attempt_connect(false);
 
   ui.splash();
 
-  while(keypress==0)   {
-    if(wifi_active.get()) {
+  while (keypress == 0)
+  {
+    if (wifi_active.get())
+    {
       do_server();
     }
   }
 
   //fxn.put(0); // in case fxn is afu
-
-  exe_fxn();
-
+  if (is_initialized())
+  {
+    exe_fxn();
+  }
+  else
+  {
+    init_all();
+  }
 }
 
 byte wifi_dly_ctr = 0;
 
-void loop() {
-  static boolean trigger_reset=false;
-  if (keypress) {
+void loop()
+{
+  static boolean trigger_reset = false;
+  // static int loop_count = 0;
+  // ui.terminal_debug("Loop: " + String(loop_count++));
+  if (keypress)
+  {
     process_keypress();
-  } else {
+  }
+  else
+  {
     housekeep();
   }
-  if (triggered) {
+  if (triggered)
+  {
     // digitalWrite(triggered_led_pin,HIGH);
-    if(!trigger_reset) {
+    if (!trigger_reset)
+    {
       reset_trigger();
-      trigger_reset=true;
+      trigger_reset = true;
     }
     do_trigger();
-    if(settings_get_ext_clk()==1) {
-      triggered=false;
-    } else {
-      triggered = repeat_on.get() || doing_trigger || user_doing_trigger;      
+    if (settings_get_ext_clk() == 1 || fxn.get() == SETTINGS_FXN)
+    {
+      triggered = false;
+    }
+    else
+    {
+      triggered = repeat_on.get() || doing_trigger || user_doing_trigger;
     }
     // disable_trigger(triggered);
     //Serial.println("Triggered? "+String(triggered));
-  } else {
-    if(settings_get_ext_clk()==0) {
-      trigger_reset=false;
-      digitalWrite(triggered_led_pin,LOW);
+  }
+  else
+  {
+    if (settings_get_ext_clk() == 0)
+    {
+      trigger_reset = false;
+      digitalWrite(triggered_led_pin, LOW);
+      terminal_print_status();
     }
   }
-  int encoder_val = e.getEncoderValue();
-  if (encoder_val != 0 && encoder_val != last_encoder_val) {
-    adjust_param(encoder_val);
-  } else {
-  }
-  if(wifi_active.get()) {
-    if(true || wifi_dly_ctr++==0) do_server();
+
+  if (e.is_adjusting())
+  {
+    adjust_param(e.getEncoderValue());
+    e.resetEncoder();
   }
 
+  if (cmd_available)
+  {
+    process_cmd(in_str);
+    in_str = "";
+    cmd_available = false;
+  }
+  if (wifi_active.get())
+  {
+    if (true || wifi_dly_ctr++ == 0)
+      do_server();
+  }
 }

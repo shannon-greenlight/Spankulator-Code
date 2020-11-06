@@ -20,24 +20,26 @@ class SPANK_fxn
 {
     // user-accessible "public" interface
 public:
-    typedef void(SPANK_fxn::*FunctionPointer)();
-    SPANK_fxn(String _name,String *_labels, uint16_t ** _params, uint16_t _num_params, SPANK_ui *_ui);
+    typedef void (SPANK_fxn::*FunctionPointer)();
+    SPANK_fxn(String _name, String *_labels, uint16_t **_params, uint16_t _num_params, SPANK_ui *_ui);
     String name;
     String *labels;
-    boolean check_params=false;
+    String *string_params;
+    boolean check_params = false;
 
     uint16_t num_params, param_num;
     uint8_t digit_num;
     void begin(void);
-    uint16_t get_param(int16_t indx=-1);
-    uint16_t get_min(int16_t indx=-1);
-    uint16_t get_max(int16_t indx=-1);
+    void init();
+    uint16_t get_param(int16_t indx = -1);
+    uint16_t get_min(int16_t indx = -1);
+    uint16_t get_max(int16_t indx = -1);
     void adjust_param(int e, unsigned long delta);
     void put_param(uint16_t val);
     int check_param(int the_param);
     void inc_param_num_by(int val);
     void inc_dig_num_by(int val);
-    void hilight_param(void);
+    void hilight_param();
     String get_label(int label_num);
     void printParams();
     String toJSON(String, String);
@@ -46,22 +48,26 @@ public:
     void display(void); // calls vectored fxn
     void copy_to(SPANK_fxn &target);
     void debug(void);
-    uint16_t* mins;
-    uint16_t* maxs;
+    uint16_t *mins;
+    uint16_t *maxs;
+    uint16_t *init_vals;
+
+    byte display_offset = 0; // user sets this to 1 to make room for sequence
+    boolean enable_hilight = true;
 
     int offset(void);
 
     // vectored fxns
     FunctionPointer display_fxn;
-    void(*trigger_fxn)();
+    void (*trigger_fxn)();
 
     // library-accessible "private" interface
 private:
-    int ui_lines[3];
     SPANK_ui *ui;
     EEPROM_Arr16 params;
     void default_display(void); // prints name and params
     uint8_t get_num_digits(int);
     String calc_format(uint8_t);
+    void print_param(uint16_t, uint16_t);
 };
 #endif

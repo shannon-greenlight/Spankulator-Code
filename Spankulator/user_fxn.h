@@ -82,6 +82,21 @@ boolean user_doing_trigger = false;
 void user_set_params(char c);
 void user_display();
 
+char user_get_char()
+{
+  return user_string.charAt(user_dig_num);
+}
+
+void user_print_sput()
+{
+  ui.printLine(user_get_sput(user_get_char()), LINE_3, 1);
+}
+
+void user_stop_trigger()
+{
+  user_doing_trigger = doing_trigger = false;
+}
+
 void debug()
 {
   Serial.println("Howdy User Fxn!");
@@ -102,7 +117,8 @@ void user_init()
 
 void user_underline_char()
 {
-  ui.underline_char(user_dig_num, 0, 1, 8); // min(9,user_dig_num)
+  const char *c = user_param_num == 0 && !triggered ? "-" : "^";
+  ui.underline_char(user_dig_num, 0, 1, 8, c); // min(9,user_dig_num)
 }
 
 void user_update_user_string(char cmd, String in_str)
@@ -200,6 +216,7 @@ void user_begin()
     {
       // Serial.println("User Begin: "+user_spanks[i]->name);
       user_spanks[i]->num_params = f.num_params;
+      user_spanks[i]->check_params = f.check_params;
       user_spanks[i]->trigger_fxn = f.trigger_fxn;
       user_spanks[i]->string_params = f.string_params;
       for (int j = 0; j < f.num_params; j++)
@@ -223,7 +240,7 @@ void user_display()
   ui.fill(BLACK, 16);
   ui.t.clrDown("9");
   ui.printLine(user_string.get(), LINE_1, 1);
-  if (user_param_num == 0)
+  if (true || user_param_num == 0)
   {
     user_underline_char();
   }
@@ -256,57 +273,47 @@ void user_fxn()
 
 void user_inc_param_num()
 {
-  if (user_param_num == 0)
+  // Serial.println("Char: " + String(user_string.charAt(user_dig_num)) + "Dig# " + String(user_dig_num));
+  if (user_string.charAt(user_dig_num))
   {
-    user_param_num = 1;
-  }
-  else
-  {
-    user_spanks[user_dig_num]->inc_param_num_by(1);
-    if (user_spanks[user_dig_num]->param_num == 0)
+    if (user_param_num == 0)
     {
-      user_param_num = 0;
+      user_param_num = 1;
     }
+    else
+    {
+      user_spanks[user_dig_num]->inc_param_num_by(1);
+      if (user_spanks[user_dig_num]->param_num == 0)
+      {
+        user_param_num = 0;
+      }
+    }
+    user_display();
   }
-  user_display();
 }
 
 void user_dec_param_num()
 {
-  if (user_param_num == 0)
+  if (user_string.charAt(user_dig_num))
   {
-    user_param_num = 1;
-    user_spanks[user_dig_num]->param_num = user_spanks[user_dig_num]->num_params - 1;
-  }
-  else
-  {
-    if (user_spanks[user_dig_num]->param_num == 0)
+    if (user_param_num == 0)
     {
-      user_param_num = 0;
+      user_param_num = 1;
+      user_spanks[user_dig_num]->param_num = user_spanks[user_dig_num]->num_params - 1;
     }
     else
     {
-      user_spanks[user_dig_num]->inc_param_num_by(-1);
+      if (user_spanks[user_dig_num]->param_num == 0)
+      {
+        user_param_num = 0;
+      }
+      else
+      {
+        user_spanks[user_dig_num]->inc_param_num_by(-1);
+      }
     }
+    user_display();
   }
-  user_display();
-}
-
-void user_inc_param_num_by(int val)
-{
-  if (user_param_num == 0)
-  {
-    user_param_num += val;
-    if (user_param_num < 0)
-      user_param_num = 1;
-    if (user_param_num > 1)
-      user_param_num = 0;
-  }
-  else
-  {
-    user_spanks[user_dig_num]->inc_param_num_by(val);
-  }
-  user_display();
 }
 
 void user_remove_blank()
@@ -418,6 +425,9 @@ void user_put_param(int param)
 
 void user_adjust_param(int encoder_val)
 {
+  //user_stop_trigger();
+  if (triggered)
+    return;
   if (user_param_num == 0)
   {
     // char c = user_ops[user_op_index];
@@ -441,7 +451,19 @@ void user_adjust_param(int encoder_val)
       user_string.append(String(c));
     }
     user_set_params(c);
-    user_display();
+    ui.fill(BLACK, 16);
+    ui.t.clrDown("9");
+    ui.printLine(user_string.get(), LINE_1, 1);
+    user_underline_char();
+    if (user_string.charAt(user_dig_num) == ' ')
+    {
+      ui.printLine("< or > to delete", LINE_3, 1);
+    }
+    else
+    {
+      user_print_sput();
+    }
+    //user_display();
   }
   else
   {
@@ -458,17 +480,12 @@ void user_do_trigger()
     // initialize  ptr and set flag
     user_doing_trigger = true;
     user_dig_num = 0;
-    //user_display();
+    user_param_num = 0;
     user_underline_char();
+    // user_print_sput();
     // the_spanker->debug();
   }
   the_spanker = user_spanks[user_dig_num];
-  // ui.terminal_debug(the_spanker->name + " doing trigger at: " + String(millis()));
-  //user_display();
-  //SPANK_fxn f = user_get_spank_obj(user_string.charAt(user_dig_num));
-  //Serial.println(f.name);
-  //Serial.println(String(*f.trigger_fxn));
-  //f.trigger_fxn();
   the_spanker->trigger_fxn();
   if (!doing_trigger)
   {
@@ -478,13 +495,13 @@ void user_do_trigger()
     } while (user_string.charAt(user_dig_num) == ' ');
     if (user_dig_num >= user_string.length())
     {
-      user_doing_trigger = doing_trigger = false;
+      user_stop_trigger();
+      // user_doing_trigger = doing_trigger = false;
     }
     else
     {
-      // the_spanker->debug();
-      //user_display();
       user_underline_char();
+      // user_print_sput();
     }
   }
 }

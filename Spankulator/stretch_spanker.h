@@ -8,12 +8,14 @@ SPANK_fxn stretch_spanker("Stretch", stretch_labels, stretch_stuff, sizeof(_stre
 
 void do_stretch_pulse(unsigned int delay, unsigned int pulse_len)
 {
-  int aval1 = delay % 1023;
-  int aval2 = pulse_len % 1023;
+  int aval1 = 1023;
+  scale_and_offset(&aval1);
   write_dac(aval1);
   do_delay(delay);
   gate.set();
-  write_dac(aval2);
+  aval1 = 0;
+  scale_and_offset(&aval1);
+  write_dac(aval1);
   do_delay(pulse_len);
   gate.reset();
 }

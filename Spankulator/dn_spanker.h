@@ -13,6 +13,7 @@ void dn_trigger()
   float longest_pulse = float(the_spanker->get_param(LONGEST_PULSE));
   float shortest_pulse = the_spanker->get_param(SHORTEST_PULSE);
   float the_swell = (shortest_pulse - longest_pulse) / the_spanker->get_param(NUM_PULSES);
+  // Serial.println("Longest: " + String(longest_pulse) + " Shortest: " + String(shortest_pulse));
   int rnd = the_spanker->get_param(RANDOMNESS);
   if (!doing_trigger)
   {
@@ -21,7 +22,7 @@ void dn_trigger()
     do_delay(the_spanker->get_param(INITIAL_DELAY));
   }
   send_one_pulse(the_delay, longest_pulse, shortest_pulse, rnd, the_swell);
-  the_delay += the_swell;
+  the_delay += the_swell * 1.1;
   if (the_delay <= shortest_pulse)
   {
     doing_trigger = false;

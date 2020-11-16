@@ -104,7 +104,7 @@ void SPANK_fxn::adjust_param(int e, unsigned long delta)
 
 int SPANK_fxn::check_param(int param)
 {
-    // Serial.println("Param OK param#: "+ String(param_num));
+    // (*ui).terminal_debug("Param OK param#: " + String(param_num) + " Offset: " + String(display_offset));
     switch (param_num)
     {
     case LONGEST_PULSE:
@@ -313,6 +313,7 @@ void SPANK_fxn::copy_to(SPANK_fxn &target)
     target.trigger_fxn = trigger_fxn;
     target.num_params = num_params;
     target.string_params = string_params;
+    target.check_params = check_params;
     //Serial.println("Copying: " + target.name + " Num params: " + String(target.num_params));
 }
 

@@ -290,7 +290,7 @@ public:
     printLine(label + String(buf) + suffix, lines[line_num], font_size);
   }
 
-  void underline_char(byte char_num, byte line_num, int font_size = 2, int offset = 0)
+  void underline_char(byte char_num, byte line_num, int font_size = 2, int offset = 0, const char *c = "-")
   {
     String prefix = "";
     for (int i = 0; i < char_num; i++)
@@ -299,7 +299,7 @@ public:
     }
     // Serial.println("Prefix: " + prefix);
     fill(BLACK, lines[line_num] + offset);
-    printLine(prefix + "-", lines[line_num] + offset, font_size);
+    printLine(prefix + c, lines[line_num] + offset, font_size);
     //(*display).println(prefix + "-");
   }
 

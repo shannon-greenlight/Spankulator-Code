@@ -104,7 +104,7 @@ boolean event_pending = false;
 void do_delay(unsigned int d)
 {
   // Serial.println("");
-  // Serial.println("Do delay: "+String(d)+" millis: " + String(millis()));
+  // Serial.println("Do delay: " + String(d) + " millis: " + String(millis()));
   if (d < 200)
   {
     delay(d);

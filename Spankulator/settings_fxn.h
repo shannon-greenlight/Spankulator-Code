@@ -11,6 +11,7 @@ void settings_fxn()
 {
   the_spanker = &settings_spanker;
   settings_spanker.display();
+  disable_ext_trigger();
 }
 
 uint16_t settings_get_ext_clk()

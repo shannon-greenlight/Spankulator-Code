@@ -84,6 +84,7 @@ public:
   void clearDisplay()
   {
     // maybe clr terminal here
+    t.clrScreen();
     (*display).clearDisplay();
   }
 
@@ -104,6 +105,7 @@ public:
 
   void terminal_print_status(bool repeat_on, bool triggered)
   {
+    // static int count = 0;
     String rpeat = repeat_on ? "ON " : "OFF";
     t.setCursor(FXN_ROW, "15");
     t.print("Repeat: " + rpeat);

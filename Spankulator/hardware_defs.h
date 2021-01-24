@@ -5,6 +5,7 @@ const byte repeat_led_pin = 6;
 const byte gate_out_pin = 9;
 const byte disable_trigger_pin = 11;
 const byte triggered_led_pin = 12;
+const byte disable_ext_trigger_pin = 13;
 
 const byte aout_pin = A0;
 const byte ain1_pin = A1;

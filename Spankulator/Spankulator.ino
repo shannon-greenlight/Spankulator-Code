@@ -86,6 +86,12 @@ bool is_initialized()
 
 void setup(void)
 {
+  // analogReference(AR_INTERNAL);
+
+  set_adj();
+  scale = 1.0;
+  offset = 0;
+
   begin_all();
 
   set_encoder(); // sets msb,lsb for two types of encoder
@@ -112,6 +118,7 @@ void setup(void)
   {
     init_all();
   }
+  // analogReadResolution(8);
 }
 
 byte wifi_dly_ctr = 0;
@@ -127,6 +134,7 @@ void loop()
   }
   else
   {
+    set_adj();
     housekeep();
   }
   if (triggered)
@@ -146,12 +154,11 @@ void loop()
     {
       triggered = repeat_on.get() || doing_trigger || user_doing_trigger;
     }
-    // disable_trigger(triggered);
     //Serial.println("Triggered? "+String(triggered));
   }
   else
   {
-    if (settings_get_ext_clk() == 0)
+    if (settings_get_ext_clk() == 0 && trigger_reset)
     {
       trigger_reset = false;
       digitalWrite(triggered_led_pin, LOW);

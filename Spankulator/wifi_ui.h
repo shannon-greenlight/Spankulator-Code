@@ -301,7 +301,7 @@ void select_wifi_fxn()
 {
   if (wifi_enabled())
   {
-    disable_trigger(true);
+    disable_ext_trigger();
     switch (select_wifi_screen)
     {
     case 0:

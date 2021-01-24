@@ -73,14 +73,19 @@ boolean all_buttons_up()
 
 void reset_trigger()
 {
+  // Serial.println("Resetting triggers!");
   digitalWrite(disable_trigger_pin, LOW);
+  // digitalWrite(disable_ext_trigger_pin, LOW);
   delay(1);
   digitalWrite(disable_trigger_pin, HIGH);
+  delay(1);
+  digitalWrite(disable_ext_trigger_pin, LOW);
 }
 
-void disable_trigger(boolean disable)
+void disable_ext_trigger()
 {
-  //digitalWrite(disable_trigger_pin,disable);
+  // Serial.println("Disabling ext trigger!");
+  digitalWrite(disable_ext_trigger_pin, HIGH);
 }
 
 void do_toggle()

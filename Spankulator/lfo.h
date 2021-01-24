@@ -188,11 +188,12 @@ void lfo_do_trigger()
 
 void lfo_fxn()
 {
-    disable_trigger(false);
     the_spanker = &lfo_spanker;
     lfo_set_params();
     lfo_set_waveform();
     trigger_params_set = false;
+    set_adj();
+    lfo_housekeep();
     init_adj = adj;
     lfo_display();
 }

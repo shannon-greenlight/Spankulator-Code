@@ -8,6 +8,8 @@ String dvm_params_toJSON()
 {
     String out = "";
     out += "{ ";
+    out += toJSON("selected", "true");
+    out += ", ";
     out += toJSON("param_num", "0");
     out += ", ";
     out += toJSON("label", "Mode");
@@ -62,7 +64,8 @@ void dvm_put_param(int val)
 
 void dvm_do_meas(int ival)
 {
-    float corr = 101.088;
+    // float corr = 101.088;
+    float corr = 102.4;
     // Serial.println(analogRead(ain2_pin));
     char buf[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // buffer to print up to 9 digits
     double val = float(ival) / corr;
@@ -105,16 +108,19 @@ void dvm_do_trigger()
     byte pin = dvm_mode.get() == 0 ? ain2_pin : ain3_pin;
     // Serial.println("Reading pin: "+String(pin));
     //String format = "%"+String(digits)+"d";
-    int ival = 512 - analogRead(pin);
+    int reading = analogRead(pin);
+    int ival = 522 - reading;
     // delay(1);
     // //int ival = 212;
-    // Serial.println((ival));
+    // Serial.println((reading));
+    ui.terminal_debug("Reading: " + String(reading));
     // return;
-    if (ival == -511 || ival == 512)
+    if (reading == 0 || reading >= 1023)
     {
         // overload!
-        String ovl = ival == 512 ? "++++" : "----";
+        String ovl = reading == 0 ? "++++" : "----";
         ui.printLine(ovl, 20, 4);
+        dvm_meas = ovl;
     }
     else
     {
@@ -134,12 +140,13 @@ void dvm_do_trigger()
 
 void dvm_fxn()
 {
-    ui.clearDisplay();
+    ui.newFxn("User");
+    // ui.clearDisplay();
     //ui.printText("DVM",0,0,2);
     dvm_adjust_param(0, 0); // prints result
     //triggered = doing_trigger = true;
     reset_trigger();
-    //disable_trigger(true);
+    disable_ext_trigger();
 }
 
 void dvm_begin()

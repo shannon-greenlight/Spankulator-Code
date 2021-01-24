@@ -97,7 +97,7 @@ void user_stop_trigger()
   user_doing_trigger = doing_trigger = false;
 }
 
-void debug()
+void user_debug()
 {
   Serial.println("Howdy User Fxn!");
   user_dig_num++;

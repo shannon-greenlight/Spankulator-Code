@@ -4,7 +4,6 @@ FunctionPointer functionPointers[] = {up_fxn, dn_fxn, stretch_fxn, toggle_fxn, m
 int num_fxns = sizeof(functionPointers) / sizeof(functionPointers[0]);
 void exe_fxn()
 {
-  disable_trigger(false);
   (*functionPointers[fxn.get()])();
 }
 
@@ -111,7 +110,6 @@ void do_trigger()
     break;
   default:
     the_spanker->trigger_fxn();
-    //Serial.println("Unknown trigger fxn: " + String(fxn.get()));
   }
 }
 
@@ -350,7 +348,7 @@ void dec_param_num()
 
 void housekeep()
 {
-  set_adj();
+  //set_adj();
   switch (fxn.get())
   {
   case LFO_FXN:
@@ -390,6 +388,7 @@ void terminal_print_status()
 
 void new_fxn()
 {
+  //ui.clearDisplay();
   triggered = doing_trigger = user_doing_trigger = false;
   reset_trigger();
   event_pending = false;
@@ -403,7 +402,6 @@ void heartbeat()
 {
   if (!keypress)
   {
-
     if (!digitalRead(up_button_pin))
       keypress = 62;
     if (!digitalRead(dn_button_pin))
@@ -469,6 +467,11 @@ void heartbeat()
   }
 }
 
+void hilevel_debug()
+{
+  Serial.println("Hilevel debug!");
+}
+
 void process_keypress()
 {
   //ui.terminal_debug("Processing keypress: " + String(keypress));
@@ -501,8 +504,9 @@ void process_keypress()
   case 33: // !
     triggered = !triggered;
     terminal_print_status();
+    reset_trigger();
     //ui.terminal_debug("Triggered: " + String(triggered) + " Button: " + String(digitalRead(trigger_button_pin)));
-    //delay(250);
+    delay(50);
     break;
   case 65: // up arrow in esc mode A
     if (esc_mode)
@@ -528,6 +532,9 @@ void process_keypress()
       dec_dig_num();
     }
     break;
+  case '~':
+    hilevel_debug();
+    break;
     // default:
     //   Serial.println("Unknown keypress: "+String(keypress));
   }
@@ -538,12 +545,14 @@ void process_keypress()
   int j = 0;
   do
   {
-    reset_trigger();
+    if (keypress == 33)
+      reset_trigger();
     keyup = all_buttons_up();
-    //ui.terminal_debug("Waiting for keyup: " + String(j++));
-    // Serial.println(keyup);
+    delay(50);
+    // ui.terminal_debug("Waiting for keyup: " + String(j++));
+    // Serial.println(keypress);
   } while (!keyup);
-  delay(50);
+  //delay(50);
   keypress = 0;
   //Serial.println("Esc Mode: "+String(esc_mode));
 }
@@ -627,7 +636,6 @@ void fxn_begin()
 
   keypress = 0;
   reset_trigger();
-  disable_trigger(false);
 
   digitalWrite(repeat_led_pin, repeat_on.get());
 }

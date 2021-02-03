@@ -121,8 +121,6 @@ void setup(void)
   // analogReadResolution(8);
 }
 
-byte wifi_dly_ctr = 0;
-
 void loop()
 {
   static boolean trigger_reset = false;
@@ -130,7 +128,14 @@ void loop()
   // ui.terminal_debug("Loop: " + String(loop_count++));
   if (keypress)
   {
-    process_keypress();
+    if (keypress == -1) // Screen Saver is not implemented. This code is "just in case"
+    {
+      ui.terminal_debug("No activity!");
+    }
+    else
+    {
+      process_keypress();
+    }
   }
   else
   {
@@ -180,7 +185,6 @@ void loop()
   }
   if (wifi_active.get())
   {
-    if (true || wifi_dly_ctr++ == 0)
-      do_server();
+    do_server();
   }
 }

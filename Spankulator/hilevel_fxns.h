@@ -400,6 +400,7 @@ void new_fxn()
 //boolean monitor = false;
 void heartbeat()
 {
+  //static int inactivity_timer = 0;
   if (!keypress)
   {
     if (!digitalRead(up_button_pin))
@@ -430,6 +431,12 @@ void heartbeat()
       esc_mode = true;
       keypress = 68;
     };
+    // inactivity_timer++;
+    // if (inactivity_timer > 100)
+    // {
+    //   keypress = -1;
+    //   //inactivity_timer = 0;
+    // }
   }
   else
   {

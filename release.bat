@@ -24,6 +24,8 @@ echo #define VERSION_NUM "v%release_num%" >> %file_path%
 echo. >> %file_path%
 echo #endif >> %file_path%
 
+call make.bat
+
 :end
 echo Goodbye!
 

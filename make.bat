@@ -11,24 +11,4 @@ if errorlevel 1 (
    echo Compiler Error: %errorlevel%
    exit /b %errorlevel%
 )
-echo.
-echo.
-echo Available COM ports
-echo -------------------
-powershell.exe [System.IO.Ports.SerialPort]::getportnames()
-echo.
-echo.
-echo Using: %SPANK_PORT%
-
-set port=%SPANK_PORT%
-set /p port=What's the COM port? (please enter a number or press ENTER to use com%SPANK_PORT%) 'x' to exit 
-
-if %port% == x exit
-
-setx SPANK_PORT %port%
-
-@mode com%port% baud=1200
-pause
-
-.\updater\bossac.exe -d -U true -i -e -w -v -b %build_path%\Spankulator.ino.bin -R
-pause
+set /p exitkey= "Press any key to continue..."

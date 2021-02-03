@@ -39,6 +39,14 @@ public:
     display = _display;
   }
 
+  void drawBitmap(int x, int y, const uint8_t *bitmap)
+  {
+    clearDisplay();
+    //printText("Greenface",0,0,2);
+    (*display).drawBitmap(x, y, bitmap, 128, 64, WHITE);
+    showDisplay();
+  }
+
   void begin(const uint8_t *bitmap)
   {
     // SSD1306 Init
@@ -53,11 +61,7 @@ public:
     {
       for (int i = 0; i < 48; i += 2)
       {
-        clearDisplay();
-        //printText("Greenface",0,0,2);
-        (*display).drawBitmap(0, 64 - i, bitmap, 128, 64, WHITE);
-        showDisplay();
-        //delay(10);
+        drawBitmap(0, 64 - i, bitmap);
       }
       //clearDisplay();
       fill(BLACK, 16);
